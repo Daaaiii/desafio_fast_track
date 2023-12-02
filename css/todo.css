@@ -1,0 +1,17 @@
+body {
+	background-color: var(--background);
+	color: var(--roxo);
+}
+.todo-nav-container {
+	background-color: var(--background);
+	color: var(--roxo);
+}
+.submit {
+	background-color: var(--roxo);
+	border: 1px solid var(--roxo);
+	color: var(--background);
+}
+.submit:hover {
+	border: 2px solid var(--roxo);
+}
+
