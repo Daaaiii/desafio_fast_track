@@ -39,46 +39,84 @@
 			</div>
 		</nav>
 		<main>
-			<form>
+			<div id="alert" class="offset-4 col-4"></div>
+			<form class="grid offset-4 col-4 needs-validation" novalidate>
 				<div class="mb-1">
 					<label for="task" class="form-label"></label>
 					<input
 						class="form-control"
 						type="text"
-						name=""
+						name="task"
 						id="task"
 						placeholder="Tarefa"
+						required
 					/>
+					<div class="invalid-feedback">Adicione um título</div>
 				</div>
-				<div class="mb-1">
-					<label for="init" class="form-label"></label>
-					<input class="form-control" type="date" name="" id="init" />
+				<div class="row">
+					<div class="col mb-1">
+						<label for="init" class="form-label"></label>
+						<input
+							class="form-control"
+							type="date"
+							name="init"
+							id="init"
+							required
+						/>
+						<div class="invalid-feedback">Adicione uma data de início</div>
+					</div>
+					<div class="col mb-1">
+						<label for="hourInit" class="form-label"></label>
+						<input
+							class="form-control"
+							type="time"
+							name="hourInit"
+							id="hourInit"
+							required
+						/>
+						<div class="invalid-feedback">Adicione um horário de início</div>
+					</div>
 				</div>
-				<div class="mb-1">
-					<label for="hourInit" class="form-label"></label>
-					<input class="form-control" type="time" name="" id="hourInit" />
-				</div>
-				<div class="mb-1">
-					<label for="end" class="form-label"></label>
-					<input class="form-control" type="date" name="" id="end" />
-				</div>
-				<div class="mb-1">
-					<label for="HourEnd" class="form-label"></label>
-					<input class="form-control" type="time" name="" id="hourEnd" />
+				<div class="row">
+					<div class="col mb-1">
+						<label for="end" class="form-label"></label>
+						<input
+							class="form-control"
+							type="date"
+							name="end"
+							id="end"
+							required
+						/>
+						<div class="invalid-feedback">Adicione uma data de término</div>
+					</div>
+					<div class="col mb-1">
+						<label for="hourEnd" class="form-label"></label>
+						<input
+							class="form-control"
+							type="time"
+							name="hourEnd"
+							id="hourEnd"
+							required
+						/>
+						<div class="invalid-feedback">Adicione um horário de término</div>
+					</div>
 				</div>
 				<div class="mb-1">
 					<label for="description"></label>
-					<textarea class="rounded"
+					<textarea 
+						class="rounded col-12"
 						name="description"
 						id="description"
-						cols="30"
-						rows="10"
 						placeholder="Descrição"
+						required
 					></textarea>
+					<div class="invalid-feedback">Adicione uma descrição</div>
 				</div>
-				<button type="submit" class="btn submit">Criar tarefa</button>
+				<button id="task-btn" type="submit" class="btn submit offset-4 col-4">
+					Criar tarefa
+				</button>
 			</form>
 		</main>
-        <script src="./js/todo.js"></script>
+		<script src="./js/todo.js"></script>
 	</body>
 </html>
