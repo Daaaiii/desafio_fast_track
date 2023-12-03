@@ -29,7 +29,7 @@
 						style="height: 50px"
 						class="img-fluid rounded-4"
 					/>
-					<h1 class="title mx-2">Olá, {{userName}}</h1>
+					<h1 class="title mx-2">Olá, <span id="userName"></span></h1>
 				</div>
 				<div class="d-flex">
 					<span id="today" class="m-2"></span>
@@ -103,7 +103,7 @@
 				</div>
 				<div class="mb-1">
 					<label for="description"></label>
-					<textarea 
+					<textarea
 						class="rounded col-12"
 						name="description"
 						id="description"
@@ -112,10 +112,157 @@
 					></textarea>
 					<div class="invalid-feedback">Adicione uma descrição</div>
 				</div>
-				<button id="task-btn" type="submit" class="btn submit offset-4 col-4">
+				<button
+					id="task-btn"
+					type="submit"
+					class="btn submit offset-4 col-4 mb-3"
+				>
 					Criar tarefa
 				</button>
 			</form>
+			<div class="offset-1 col-10">
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">Tarefa</th>
+							<th scope="col">Início</th>
+							<th scope="col">Término</th>
+							<th scope="col">Status</th>
+							<th scope="col">Alterar</th>
+						</tr>
+					</thead>
+					<tbody id="taskContainer"></tbody>
+				</table>
+			</div>
+			<div
+				class="modal fade"
+				id="taskDetailModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="taskDetailModalLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="taskDetailModalLabel">
+								Detalhes da Tarefa
+							</h5>
+						</div>
+						<div class="modal-body"></div>
+						<div class="modal-footer">
+							<button
+								type="button"
+								id="closeModalBtn"
+								class="btn btn-secondary"
+								data-dismiss="modal"
+							>
+								Fechar
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div
+				class="modal fade"
+				id="changeTaskModal"
+				tabindex="-1"
+				role="dialog"
+				aria-labelledby="changeTaskModalLabel"
+				aria-hidden="true"
+			>
+				<div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="changeTaskModalLabel">
+								Detalhes da Tarefa
+							</h5>
+						</div>
+						<div class="modal-body">
+							<div id="change-body">
+								<form class="grid offset-2 col-8 mb-3 needs-validation" novalidate>
+									<div class="mb-1">
+										<label for="task" class="form-label"></label>
+										<input
+											class="form-control"
+											type="text"
+											name="task"
+											id="task-modal"
+											placeholder="Tarefa"
+											required
+										/>
+										<div class="invalid-feedback">Adicione um título</div>
+									</div>
+									<div class="row">
+										<div class="col mb-1">
+											<label for="init" class="form-label"></label>
+											<input
+												class="form-control"
+												type="date"
+												name="init"
+												id="init-modal"
+												required
+											/>
+											<div class="invalid-feedback">Adicione uma data de início</div>
+										</div>
+										<div class="col mb-1">
+											<label for="hourInit" class="form-label"></label>
+											<input
+												class="form-control"
+												type="time"
+												name="hourInit"
+												id="hourInit-modal"
+												required
+											/>
+											<div class="invalid-feedback">Adicione um horário de início</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col mb-1">
+											<label for="end" class="form-label"></label>
+											<input
+												class="form-control"
+												type="date"
+												name="end"
+												id="end-modal"
+												required
+											/>
+											<div class="invalid-feedback">Adicione uma data de término</div>
+										</div>
+										<div class="col mb-1">
+											<label for="hourEnd" class="form-label"></label>
+											<input
+												class="form-control"
+												type="time"
+												name="hourEnd"
+												id="hourEnd-modal"
+												required
+											/>
+											<div class="invalid-feedback">Adicione um horário de término</div>
+										</div>
+									</div>
+									<div class="mb-1">
+										<label for="description"></label>
+										<textarea
+											class="rounded col-12"
+											name="description"
+											id="description-modal"
+											placeholder="Descrição"
+											required
+										></textarea>
+										<div class="invalid-feedback">Adicione uma descrição</div>
+									</div>
+							</div>
+							<div class="mb-2 offset-1 col-10">
+								<button id="change-task-modal" class="btn btn-warning">Alterar tarefa</button>
+								<button id="delete-task" class="btn btn-warning">Excluir tarefa</button>
+								<button id="done-task" class="btn btn-warning">Marcar como realizada</button>
+								<button id="cancel-task" class="btn btn-warning">Cancelar</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</main>
 		<script src="./js/todo.js"></script>
 	</body>

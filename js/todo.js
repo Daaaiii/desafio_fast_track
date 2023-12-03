@@ -23,6 +23,14 @@ window.onload = function () {
 		"/" +
 		data.getFullYear();
 	day.innerText = today;
+
+	const user = JSON.parse(localStorage.getItem("LoggedUser"));
+
+	const userName = document.getElementById("userName");
+	userName.innerText = user[0].name;
+	displayTasks();
+	detailTask();
+	changeTasks();
 };
 
 const logout = () => {
@@ -54,9 +62,7 @@ const checkInputs = () => {
 };
 
 const createTask = () => {
-	btnTask.addEventListener("click", (event) => {
-		event.preventDefault();
-
+	btnTask.addEventListener("click", () => {
 		const form = document.querySelector(".needs-validation");
 
 		if (!form.checkValidity()) {
@@ -70,44 +76,190 @@ const createTask = () => {
 		const endDate = document.getElementById("end").value;
 		const endTime = document.getElementById("hourEnd").value;
 		const description = document.getElementById("description").value;
-		const taskId = new Date().getTime().toString();
-		let existingTasks = [];
-		const existingTasksJSON = localStorage.getItem("taskData");
+		const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
+		const users = JSON.parse(localStorage.getItem("users"));
 
-		if (existingTasksJSON) {
-			try {
-				existingTasks = JSON.parse(existingTasksJSON);
-			} catch (error) {
-				console.error("Erro ao analisar tarefas existentes:", error);
-			}
+		const currentUserIndex = users.findIndex((user) => {
+			return user.email === loggedUser[0].email;
+		});
+
+		if (currentUserIndex !== -1) {
+			const taskId = new Date().getTime().toString();
+			const task = {
+				id: taskId,
+				taskName: taskName,
+				initDate: initDate,
+				initTime: initTime,
+				endDate: endDate,
+				endTime: endTime,
+				description: description,
+			};
+
+			users[currentUserIndex].tasks.push(task);
+
+			localStorage.setItem("users", JSON.stringify(users));
+
+			const successAlert = document.createElement("div");
+			successAlert.className = "alert alert-success mt-3";
+			successAlert.textContent = "Tarefa criada e salva com sucesso!";
+
+			document.getElementById("alert").appendChild(successAlert);
 		}
-		const task = {
-			id: taskId,
-			taskName: taskName,
-			initDate: initDate,
-			initTime: initTime,
-			endDate: endDate,
-			endTime: endTime,
-			description: description,
-		};
-
-		const taskJSON = JSON.stringify(task);
-        console.log('taskjson',taskJSON)
-        console.log('existingTasks',existingTasks)
-        existingTasks.push(taskJSON);
-
-		localStorage.setItem("taskData", existingTasks);
-
-		const successAlert = document.createElement("div");
-		successAlert.className = "alert alert-success mt-3";
-		successAlert.textContent = "Tarefa criada e salva com sucesso!";
-
-		document.getElementById("alert").appendChild(successAlert);
-
 		setTimeout(() => {
 			successAlert.remove();
-		}, 2000);
+		}, 8000);
 	});
 };
 
 createTask();
+
+const displayTasks = () => {
+	const taskContainer = document.getElementById("taskContainer");
+
+	const user = JSON.parse(localStorage.getItem("users"));
+	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
+	const users = JSON.parse(localStorage.getItem("users"));
+
+	const currentUserIndex = users.findIndex((user) => {
+		return user.email === loggedUser[0].email;
+	});
+
+	const userTasks = user[currentUserIndex].tasks;
+
+	for (let i = 0; i < userTasks.length; i++) {
+		const row = document.createElement("tr");
+		const taskId = userTasks[i].id;
+		row.setAttribute("data-task-id", taskId);
+
+		const taskCell = document.createElement("td");
+		taskCell.innerText = userTasks[i].taskName;
+		taskCell.id = "taskID";
+		taskCell.setAttribute("data-task-id", taskId);
+		row.appendChild(taskCell);
+
+		const startCell = document.createElement("td");
+		startCell.innerText = formatDateTime(
+			userTasks[i].initDate,
+			userTasks[i].initTime
+		);
+		row.appendChild(startCell);
+
+		const endCell = document.createElement("td");
+		endCell.innerText = formatDateTime(
+			userTasks[i].endDate,
+			userTasks[i].endTime
+		);
+		row.appendChild(endCell);
+
+		const statusCell = document.createElement("td");
+		statusCell.innerText = checkStatus(userTasks[i]);
+		row.appendChild(statusCell);
+
+		const changeCell = document.createElement("td");
+		const changeButton = document.createElement("button");
+		changeButton.className = "btn bg-warning";
+		changeButton.id = "btn-change";
+		changeButton.dataset.toggle = "modal";
+		changeButton.dataset.target = "#changeTaskModal";
+		changeButton.setAttribute("data-task-id", taskId);
+		changeButton.innerText = "Alterar";
+		changeCell.appendChild(changeButton);
+		row.appendChild(changeCell);
+
+		taskContainer.appendChild(row);
+	}
+};
+
+const checkStatus = (task) => {
+	const currentDate = new Date();
+
+	const initDateTime = new Date(`${task.initDate} ${task.initTime}`);
+	const endDateTime = new Date(`${task.endDate} ${task.endTime}`);
+
+	if (currentDate < initDateTime) {
+		return "Pendente";
+	} else if (currentDate >= initDateTime && currentDate <= endDateTime) {
+		return "Em andamento";
+	} else {
+		return "Em Atraso";
+	}
+};
+
+const formatDateTime = (date, time) => {
+	const formattedDate = new Date(date).toLocaleDateString("pt-BR", {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+	});
+
+	const formattedTime = time;
+
+	return `${formattedDate} às ${formattedTime}`;
+};
+
+const detailTask = () => {
+	const taskRows = document.querySelectorAll("#taskContainer tr");
+	const taskTitle = document.getElementById("taskDetailModalLabel");
+
+	const user = JSON.parse(localStorage.getItem("LoggedUser"));
+	const userTasks = user[0].tasks;
+
+	const modal = new bootstrap.Modal(document.getElementById("taskDetailModal"));
+
+	taskRows.forEach((row) => {
+		const taskNameCell = row.querySelector("td:first-child");
+		taskNameCell.addEventListener("click", () => {
+			const taskId = row.getAttribute("data-task-id");
+			const task = userTasks.find((t) => t.id === taskId);
+			taskTitle.innerText = task.taskName;
+
+			const modalBody = document.querySelector(".modal-body");
+
+			modalBody.innerHTML = `
+			<p>Início: ${task.initDate} às ${task.initTime}</p>
+			<p>Término: ${task.endDate} às ${task.endTime}</p>
+			<p>Descrição: ${task.description}</p>
+            `;
+
+			modal.show();
+		});
+	});
+	const closeModalBtn = document.getElementById("closeModalBtn");
+	closeModalBtn.addEventListener("click", () => {
+		modal.hide();
+	});
+};
+
+const changeTasks = () => {
+	const changeBtns = document.querySelectorAll("#btn-change");
+	const modal = new bootstrap.Modal(document.getElementById("changeTaskModal"));
+	const users = JSON.parse(localStorage.getItem("users"));
+	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
+	const user = users.filter((user) => user.email === loggedUser[0].email);
+
+	const tasks = user[0].tasks;
+
+	const taskTitle = document.getElementById("task-modal");
+	const initDate = document.getElementById("init-modal");
+	const hourInit = document.getElementById("hourInit-modal");
+	const endDate = document.getElementById("end-modal");
+	const hourEnd = document.getElementById("hourEnd-modal");
+	const description = document.getElementById("description-modal");
+
+	changeBtns.forEach((changeBtn) => {
+		changeBtn.addEventListener("click", () => {
+			const taskId = changeBtn.getAttribute("data-task-id");
+
+			const task = tasks.find((t) => t.id === taskId);			
+
+			taskTitle.value = task.taskName;
+			initDate.value = task.initDate;
+			hourInit.value = task.initTime;
+			endDate.value = task.endDate;
+			hourEnd.value = task.endTime;
+			description.value = task.description;
+
+			modal.show();
+		});
+	});
+};

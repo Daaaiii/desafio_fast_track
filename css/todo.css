@@ -7,11 +7,21 @@ body {
 	color: var(--roxo);
 }
 .submit {
-	background-color: var(--roxo);
-	border: 1px solid var(--roxo);
-	color: var(--background);
+	border: 2px solid var(--roxo);
+	color:var(--roxo)
+	
 }
 .submit:hover {
+	background-color: var(--roxo);
+	border: 1px solid var(--roxo);
+	color: var(--amarelo);
+}
+#closeModalBtn{
+	background-color: white;
+	border: 2px solid var(--roxo);
+	color:var(--roxo)
+}
+#closeModalBtn:hover{
+	background-color: var(--background);
 	border: 2px solid var(--roxo);
 }
-
