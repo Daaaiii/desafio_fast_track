@@ -14,4 +14,6 @@ body{
 h1{
     font-size:x-large;
 }
-
+.no-auth{
+	color: var(--verde-light);
+}

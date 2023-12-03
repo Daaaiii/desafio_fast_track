@@ -33,7 +33,7 @@
 				</div>
 				<div class="col-5">
 					<h1>Acesse sua conta</h1>
-					<form class="mb-3">
+					<form id="login" class="mb-3 needs-validation" novalidate>
 						<div class="mb-2">
 							<label for="loginEmail" class="form-label">Email</label>
 							<input
@@ -42,18 +42,21 @@
 								aria-describedby="email"
 								id="loginEmail"
 								placeholder="Digite seu email"
-							/>
-							<small class="error-message d-none" data-error-message="Preencha seu email" data-form="login"></small>
+								required							/>
+							
+							<div class="invalid-feedback">Email inválido</div>
+							<div class="no-auth"></div>
 						</div>
 						<div class="mb-2">
 							<label for="loginPassword" class="form-label">Senha</label>
-							<input type="password" class="form-control" id="loginPassword" placeholder="Digite sua senha" />
-							<small class="error-message d-none" data-error-message="Preencha sua senha" data-form="login"></small>
+							<input type="password" class="form-control" id="loginPassword" placeholder="Digite sua senha" required />
+							<div class="invalid-feedback">Senha inválida</div>
+							<div class="no-auth"></div>
 						</div>
 
-						<button type="submit" class="btn submit login">Entrar</button>
+						<button type="submit" class="btn submit login" value="login">Entrar</button>
 					</form>
-					<form>
+					<form id="register" class="needs-validation" novalidate>
 						<h1>Novo por aqui? Crie sua conta</h1>
 						<div class="mb-2">
 							<label for="registerName" class="form-label">Nome</label>
@@ -62,9 +65,9 @@
 								class="form-control"
 								aria-describedby="name"
 								id="registerName"
-								placeholder="Digite seu nome"
+								placeholder="Digite seu nome" required
 							/>
-							<small class="error-message d-none" data-error-message="Preencha seu nome" data-form="register"></small>
+							<div class="invalid-feedback">Preencha seu nome</div>
 						</div>
 						<div class="mb-2">
 							<label for="registerEmail" class="form-label">Email</label>
@@ -73,9 +76,9 @@
 								class="form-control"
 								aria-describedby="emailHelp"
 								id="registerEmail"
-								placeholder="Digite seu email"
+								placeholder="Digite seu email" required
 							/>
-							<small class="error-message d-none" data-error-message="Preencha seu email" data-form="register"></small>
+							<div class="invalid-feedback">Preencha seu email</div>
 						</div>
 						<div class="mb-2">
 							<label for="registerPassword" class="form-label">Senha</label>
@@ -83,14 +86,13 @@
 								type="password"
 								class="form-control"
 								id="registerPassword"
-								placeholder="Digite sua senha"
+								placeholder="Digite sua senha" required
 							/>
-							<small class="error-message d-none" data-error-message="Preencha sua senha" data-form="register"></small>
+							<div class="invalid-feedback">Preencha sua senha</div>
 						</div>
 
-						<button type="submit" class="btn submit register">Cadastrar</button>
-					</form>
-					<div class="form"></div>
+						<button type="submit" class="btn submit register" >Cadastrar</button>
+					</form>					
 				</div>
 			</div>
 		</div>

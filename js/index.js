@@ -2,37 +2,56 @@ const btnLogin = document.querySelector(".login");
 const btnRegister = document.querySelector(".register");
 const alerts = document.querySelectorAll("small");
 
+const validateForm = (formId) => {
+	const form = document.getElementById(formId);
 
-const validateForm = (formId, fieldIds) => {
-	const formElements = fieldIds.map(
-		(id) => document.getElementById(`${formId}${id}`).value
-	);
-
-	if (formElements.some((element) => !element)) {
-		showErrorMessage(alerts, formId);
+	if (!form.checkValidity()) {
+		form.classList.add("was-validated");
 		return false;
-	} else {
-		hideErrorMessage(alerts, formId);
-		clearFields(fieldIds, formId);
-		return true;
 	}
+
+	return true;
+};
+
+const clearFields = (fieldIds, form) => {
+	fieldIds.forEach((id) => {
+		const element = document.getElementById(`${form}${id}`);
+		if (element) {
+			element.value = "";
+		} else {
+			console.error(`Element with ${form}${id} not found.`);
+		}
+	});
+};
+const checkUser = (email, password) => {
+	const users = JSON.parse(localStorage.getItem("users"));
+	const foundUser = users.filter(
+		(user) => user.email === email && user.password === password
+	);
+	if (foundUser.length === 0) {
+		const email = document.getElementsByClassName("no-auth")[0];
+		const password = document.getElementsByClassName("no-auth")[1];
+		email.innerHTML = "Email inválido";
+		password.innerHTML = "Senha inválida";
+
+		return false;
+	}
+
+	localStorage.setItem("LoggedUser", JSON.stringify(foundUser));
+	return true;
 };
 
 const login = () => {
 	btnLogin.addEventListener("click", function (event) {
 		event.preventDefault();
+		const email = document.getElementById("loginEmail").value;
+		const password = document.getElementById("loginPassword").value;
 
-		if (validateForm("login", ["Email", "Password"])) {
-			
-			// const user={
-			// 	email,
-			// 	password
-			// }
-			// localStorage.setItem("loggedUser", JSON.stringify(user));
-
-
-
-			window.location.href = "todo.html";
+		if (validateForm("login")) {
+			if (checkUser(email, password)) {
+				clearFields(["Email", "Password"], "login");
+				window.location.href = "todo.html";
+			}
 		}
 	});
 };
@@ -43,49 +62,26 @@ const register = () => {
 	btnRegister.addEventListener("click", function (event) {
 		event.preventDefault();
 
-		validateForm("register", ["Name", "Email", "Password"]);
-		// const name = document.getElementById("registerName").value;
-		// console.log(name);
+		if (validateForm("register")) {
+			const name = document.getElementById("registerName").value;
+			const email = document.getElementById("registerEmail").value;
+			const password = document.getElementById("registerPassword").value;
+			let users = JSON.parse(localStorage.getItem("users")) || [];
+			const user = {
+				name: name,
+				email: email,
+				password: password,
+			};
+			users.push(user);
 
-		// const user = {
-		// 	name,
-		// 	email,
-		// 	password,
-		// };
-		// localStorage.setItem("user", JSON.stringify(user));
+			localStorage.setItem("users", JSON.stringify(users));
+
+			clearFields(["Name", "Email", "Password"], "register");
+			setTimeout(() => {
+				window.location.href = "todo.html";
+			}, 100);
+		}
 	});
 };
 
 register();
-
-const showErrorMessage = (inputs, form) => {
-	inputs.forEach((input) => {
-		const errorMessageAttribute = input.getAttribute("data-error-message");
-
-		const smallElement = document.querySelector(
-			`.error-message[data-error-message="${errorMessageAttribute}"][data-form="${form}"]`
-		);
-		if (smallElement) {
-			smallElement.innerText = errorMessageAttribute;
-			smallElement.classList.remove("d-none");
-		}
-	});
-};
-
-const hideErrorMessage = (inputs, form) => {
-	inputs.forEach((input) => {
-		const errorMessageAttribute = input.getAttribute("data-error-message");
-		const smallElement = document.querySelector(
-			`.error-message[data-error-message="${errorMessageAttribute}"][data-form="${form}"]`
-		);
-		if (smallElement) {
-			smallElement.classList.add("d-none");
-		}
-	});
-};
-
-const clearFields = (fieldIds, form) => {
-	fieldIds.forEach((id) => {
-		document.getElementById(`${form}${id}`).value = "";
-	});
-};
