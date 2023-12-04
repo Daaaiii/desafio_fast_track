@@ -71,12 +71,12 @@ const register = () => {
 				name: name,
 				email: email,
 				password: password,
-				tasks:[]
+				tasks: [],
 			};
 			users.push(user);
 
 			localStorage.setItem("users", JSON.stringify(users));
-			localStorage.setItem('LoggedUser',JSON.stringify(user))
+			localStorage.setItem("LoggedUser", JSON.stringify(user));
 
 			clearFields(["Name", "Email", "Password"], "register");
 			window.location.href = "todo.html";
