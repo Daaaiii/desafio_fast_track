@@ -15,5 +15,6 @@ h1{
     font-size:x-large;
 }
 .no-auth{
-	color: var(--verde-light);
+	color: var(--roxo);
+	background-color: var(--amarelo);
 }
