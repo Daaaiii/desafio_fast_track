@@ -35,6 +35,7 @@ window.onload = function () {
 
 const logout = () => {
 	btnLogout.addEventListener("click", function (event) {
+		localStorage.removeItem('LoggedUser')
 		event.preventDefault();
 		window.location.href = "index.html";
 	});
@@ -85,6 +86,12 @@ const createTask = () => {
 
 		if (currentUserIndex !== -1) {
 			const taskId = new Date().getTime().toString();
+			const status = checkStatus({
+                initDate: initDate,
+                initTime: initTime,
+                endDate: endDate,
+                endTime: endTime
+            });
 			const task = {
 				id: taskId,
 				taskName: taskName,
@@ -93,6 +100,7 @@ const createTask = () => {
 				endDate: endDate,
 				endTime: endTime,
 				description: description,
+				status: status,
 			};
 
 			users[currentUserIndex].tasks.push(task);
@@ -152,7 +160,7 @@ const displayTasks = () => {
 		row.appendChild(endCell);
 
 		const statusCell = document.createElement("td");
-		statusCell.innerText = checkStatus(userTasks[i]);
+		statusCell.innerText = userTasks[i].status;
 		row.appendChild(statusCell);
 
 		const changeCell = document.createElement("td");
@@ -200,8 +208,10 @@ const formatDateTime = (date, time) => {
 const detailTask = () => {
 	const taskRows = document.querySelectorAll("#taskContainer tr");
 	const taskTitle = document.getElementById("taskDetailModalLabel");
+	const users = JSON.parse(localStorage.getItem("users"));
+	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
+	const user = users.filter((user) => user.email === loggedUser[0].email);
 
-	const user = JSON.parse(localStorage.getItem("LoggedUser"));
 	const userTasks = user[0].tasks;
 
 	const modal = new bootstrap.Modal(document.getElementById("taskDetailModal"));
@@ -236,6 +246,9 @@ const changeTasks = () => {
 	const users = JSON.parse(localStorage.getItem("users"));
 	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
 	const user = users.filter((user) => user.email === loggedUser[0].email);
+	const currentUserIndex = users.findIndex(
+		(u) => u.email === loggedUser[0].email
+	);
 
 	const tasks = user[0].tasks;
 
@@ -246,11 +259,23 @@ const changeTasks = () => {
 	const hourEnd = document.getElementById("hourEnd-modal");
 	const description = document.getElementById("description-modal");
 
+	const changeTaskBtn = document.getElementById("change-task-modal");
+	const deleteTaskBtn = document.getElementById("delete-task");
+	const doneTaskBtn = document.getElementById("done-task");
+	const cancelTaskBtn = document.getElementById("cancel-task");
+
+
+
 	changeBtns.forEach((changeBtn) => {
 		changeBtn.addEventListener("click", () => {
-			const taskId = changeBtn.getAttribute("data-task-id");
-
-			const task = tasks.find((t) => t.id === taskId);			
+			
+			const taskId = changeBtn.getAttribute("data-task-id");	
+			const task = tasks.find((t) => t.id === taskId);
+			if(task.status !== 'Realizada'){
+				doneTaskBtn.innerText = 'Marcar como realizada'
+			}else{
+				doneTaskBtn.innerText = 'Marcar como não realizada'
+			}		
 
 			taskTitle.value = task.taskName;
 			initDate.value = task.initDate;
@@ -260,6 +285,62 @@ const changeTasks = () => {
 			description.value = task.description;
 
 			modal.show();
+
+			changeTaskBtn.addEventListener("click", () => {				
+				const updatedTask = tasks.find((task) => task.id === taskId);
+				updatedTask.taskName = taskTitle.value;
+				updatedTask.value = initDate.value;
+				updatedTask.initTime = hourInit.value;
+				updatedTask.value = endDate.value;
+				updatedTask.endTime = hourEnd.value;
+				updatedTask.description = description.value;
+
+				users[currentUserIndex].tasks = tasks;
+
+				localStorage.setItem("users", JSON.stringify(users));
+				modal.hide();
+			});
+
+			deleteTaskBtn.addEventListener("click", () => {
+				const taskIndex = tasks.findIndex((t) => t.id === taskId);
+
+				if (taskIndex !== -1) {
+					tasks.splice(taskIndex, 1);
+
+					users[currentUserIndex].tasks = tasks;
+					localStorage.setItem("users", JSON.stringify(users));
+
+					modal.hide();
+				}
+			});
+
+			doneTaskBtn.addEventListener("click", (e) => {
+				
+				const task = tasks.find((t) => t.id === taskId);
+				const taskIndex = tasks.findIndex((t) => t.id === taskId);
+
+			if(task.status !== 'Realizada'){
+				doneTaskBtn.innerText = 'Marcar como realizada'
+				tasks[taskIndex].status = "Realizada";
+
+				users[currentUserIndex].tasks = tasks;
+				localStorage.setItem("users", JSON.stringify(users));
+				modal.hide();
+			}else{
+				doneTaskBtn.innerText = 'Marcar como não realizada'
+				tasks[taskIndex].status = checkStatus(task);
+
+				users[currentUserIndex].tasks = tasks;
+				localStorage.setItem("users", JSON.stringify(users));
+				modal.hide();
+			}
+
+				
+			});
+
+			cancelTaskBtn.addEventListener("click", () => {
+				modal.hide();
+			});
 		});
 	});
 };
