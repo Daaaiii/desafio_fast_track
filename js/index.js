@@ -67,6 +67,7 @@ const register = () => {
 			const email = document.getElementById("registerEmail").value;
 			const password = document.getElementById("registerPassword").value;
 			let users = JSON.parse(localStorage.getItem("users")) || [];
+
 			const user = {
 				name: name,
 				email: email,
@@ -78,8 +79,17 @@ const register = () => {
 			localStorage.setItem("users", JSON.stringify(users));
 			localStorage.setItem("LoggedUser", JSON.stringify(user));
 
+			const successAlert = document.createElement("div");
+			successAlert.className = "alert alert-success mt-3";
+			successAlert.textContent = "Usuário criado com sucesso!";
+
+			document.getElementById("alert").appendChild(successAlert);
+
+			setTimeout(() => {
+				successAlert.remove();
+			}, 1000);
+
 			clearFields(["Name", "Email", "Password"], "register");
-			window.location.href = "todo.html";
 		}
 	});
 };

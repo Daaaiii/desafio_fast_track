@@ -25,7 +25,7 @@ window.onload = function () {
 	day.innerText = today;
 
 	const user = JSON.parse(localStorage.getItem("LoggedUser"));
-
+	
 	const userName = document.getElementById("userName");
 	userName.innerText = user[0].name;
 	displayTasks();
@@ -35,40 +35,21 @@ window.onload = function () {
 
 const logout = () => {
 	btnLogout.addEventListener("click", function (event) {
-		localStorage.removeItem('LoggedUser')
+		localStorage.removeItem("LoggedUser");
 		event.preventDefault();
 		window.location.href = "index.html";
 	});
 };
 logout();
 
-const checkInputs = () => {
-	const inputIds = [
-		"task",
-		"init",
-		"hourInit",
-		"end",
-		"hourEnd",
-		"description",
-	];
-
-	for (const inputId of inputIds) {
-		const inputValue = document.getElementById(inputId).value.trim();
-
-		if (inputValue === "") {
-			return false;
-		}
-	}
-	return true;
-};
-
 const createTask = () => {
-	btnTask.addEventListener("click", () => {
+	btnTask.addEventListener("click", (e) => {
+		e.preventDefault();
 		const form = document.querySelector(".needs-validation");
 
 		if (!form.checkValidity()) {
 			form.classList.add("was-validated");
-			return;
+			return false;
 		}
 
 		const taskName = document.getElementById("task").value;
@@ -87,11 +68,11 @@ const createTask = () => {
 		if (currentUserIndex !== -1) {
 			const taskId = new Date().getTime().toString();
 			const status = checkStatus({
-                initDate: initDate,
-                initTime: initTime,
-                endDate: endDate,
-                endTime: endTime
-            });
+				initDate: initDate,
+				initTime: initTime,
+				endDate: endDate,
+				endTime: endTime,
+			});
 			const task = {
 				id: taskId,
 				taskName: taskName,
@@ -112,10 +93,12 @@ const createTask = () => {
 			successAlert.textContent = "Tarefa criada e salva com sucesso!";
 
 			document.getElementById("alert").appendChild(successAlert);
+
+			setTimeout(() => {
+				successAlert.remove();
+				window.location.href = "todo.html";
+			}, 1000);
 		}
-		setTimeout(() => {
-			successAlert.remove();
-		}, 8000);
 	});
 };
 
@@ -128,9 +111,18 @@ const displayTasks = () => {
 	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
 	const users = JSON.parse(localStorage.getItem("users"));
 
-	const currentUserIndex = users.findIndex((user) => {
-		return user.email === loggedUser[0].email;
-	});
+	let currentUserIndex;
+	
+
+	if (loggedUser.tasks) {
+		currentUserIndex = users.findIndex((user) => {
+			return user.email === loggedUser.email;
+		});
+	} else {
+		currentUserIndex = users.findIndex((user) => {
+			return user.email === loggedUser[0].email;
+		});
+	}
 
 	const userTasks = user[currentUserIndex].tasks;
 
@@ -193,6 +185,8 @@ const checkStatus = (task) => {
 	}
 };
 
+
+
 const formatDateTime = (date, time) => {
 	const formattedDate = new Date(date).toLocaleDateString("pt-BR", {
 		day: "2-digit",
@@ -225,9 +219,7 @@ const detailTask = () => {
 
 			const modalBody = document.querySelector(".modal-body");
 
-			modalBody.innerHTML = `
-			<p>Início: ${task.initDate} às ${task.initTime}</p>
-			<p>Término: ${task.endDate} às ${task.endTime}</p>
+			modalBody.innerHTML = `			
 			<p>Descrição: ${task.description}</p>
             `;
 
@@ -246,9 +238,7 @@ const changeTasks = () => {
 	const users = JSON.parse(localStorage.getItem("users"));
 	const loggedUser = JSON.parse(localStorage.getItem("LoggedUser"));
 	const user = users.filter((user) => user.email === loggedUser[0].email);
-	const currentUserIndex = users.findIndex(
-		(u) => u.email === loggedUser[0].email
-	);
+	const currentUserIndex = users.findIndex((u) => u.email === loggedUser[0].email);
 
 	const tasks = user[0].tasks;
 
@@ -264,18 +254,15 @@ const changeTasks = () => {
 	const doneTaskBtn = document.getElementById("done-task");
 	const cancelTaskBtn = document.getElementById("cancel-task");
 
-
-
 	changeBtns.forEach((changeBtn) => {
 		changeBtn.addEventListener("click", () => {
-			
-			const taskId = changeBtn.getAttribute("data-task-id");	
+			const taskId = changeBtn.getAttribute("data-task-id");
 			const task = tasks.find((t) => t.id === taskId);
-			if(task.status !== 'Realizada'){
-				doneTaskBtn.innerText = 'Marcar como realizada'
-			}else{
-				doneTaskBtn.innerText = 'Marcar como não realizada'
-			}		
+			if (task.status !== "Realizada") {
+				doneTaskBtn.innerText = "Marcar como realizada";
+			} else {
+				doneTaskBtn.innerText = "Marcar como não realizada";
+			}
 
 			taskTitle.value = task.taskName;
 			initDate.value = task.initDate;
@@ -286,7 +273,7 @@ const changeTasks = () => {
 
 			modal.show();
 
-			changeTaskBtn.addEventListener("click", () => {				
+			changeTaskBtn.addEventListener("click", () => {
 				const updatedTask = tasks.find((task) => task.id === taskId);
 				updatedTask.taskName = taskTitle.value;
 				updatedTask.value = initDate.value;
@@ -315,27 +302,24 @@ const changeTasks = () => {
 			});
 
 			doneTaskBtn.addEventListener("click", (e) => {
-				
 				const task = tasks.find((t) => t.id === taskId);
 				const taskIndex = tasks.findIndex((t) => t.id === taskId);
 
-			if(task.status !== 'Realizada'){
-				doneTaskBtn.innerText = 'Marcar como realizada'
-				tasks[taskIndex].status = "Realizada";
+				if (task.status !== "Realizada") {
+					doneTaskBtn.innerText = "Marcar como realizada";
+					tasks[taskIndex].status = "Realizada";
 
-				users[currentUserIndex].tasks = tasks;
-				localStorage.setItem("users", JSON.stringify(users));
-				modal.hide();
-			}else{
-				doneTaskBtn.innerText = 'Marcar como não realizada'
-				tasks[taskIndex].status = checkStatus(task);
+					users[currentUserIndex].tasks = tasks;
+					localStorage.setItem("users", JSON.stringify(users));
+					modal.hide();
+				} else {
+					doneTaskBtn.innerText = "Marcar como não realizada";
+					tasks[taskIndex].status = checkStatus(task);
 
-				users[currentUserIndex].tasks = tasks;
-				localStorage.setItem("users", JSON.stringify(users));
-				modal.hide();
-			}
-
-				
+					users[currentUserIndex].tasks = tasks;
+					localStorage.setItem("users", JSON.stringify(users));
+					modal.hide();
+				}
 			});
 
 			cancelTaskBtn.addEventListener("click", () => {
